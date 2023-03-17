@@ -13,6 +13,7 @@ import { auth, db } from "@/firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import Swal from "sweetalert2";
 import { useRouter } from "next/router";
+import { Toast } from "@/utils/swal";
 export interface IIndexProps {}
 
 type Inputs = {
@@ -100,18 +101,6 @@ export default function Index(props: IIndexProps) {
         : setValidHandler("phoneNumber", false));
   };
 
-  // ALERT
-  const Toast = Swal.mixin({
-    toast: true,
-    position: "top",
-    showConfirmButton: false,
-    timer: 5000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-      toast.addEventListener("mouseenter", Swal.stopTimer);
-      toast.addEventListener("mouseleave", Swal.resumeTimer);
-    },
-  });
   useEffect(() => {
     inputs.phoneNumber &&
     inputs.firstName.length > 1 &&

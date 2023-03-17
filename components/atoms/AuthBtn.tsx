@@ -18,7 +18,8 @@ export function AuthBtn(props: IAuthBtnProps) {
           color={"white"}
           // loading={loading}
           // cssOverride={override}
-          size={40}
+          size={30}
+          className="mt-1"
           aria-label="Loading Spinner"
           data-testid="loader"
         />

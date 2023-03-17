@@ -3,6 +3,8 @@ import { Input } from "./Input";
 export interface IInputFieldProps {
   name?: String;
   handler: Function;
+  value: string;
+  valid: boolean;
 }
 
 export function InputField(props: IInputFieldProps) {
@@ -10,7 +12,12 @@ export function InputField(props: IInputFieldProps) {
     <div>
       <label className="text-textGrey text-sm">{props.name}</label>
       <div className="mt-1">
-        <Input handler={props.handler} name={props.name} />
+        <Input
+          valid={props.valid}
+          value={props.value}
+          handler={props.handler}
+          name={props.name}
+        />
       </div>
     </div>
   );

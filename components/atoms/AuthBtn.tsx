@@ -1,18 +1,30 @@
 import * as React from "react";
-
+import { BounceLoader } from "react-spinners";
 export interface IAuthBtnProps {
   text: String;
   valid: Boolean;
+  loading: Boolean;
 }
 
 export function AuthBtn(props: IAuthBtnProps) {
   return (
     <button
       className={`${
-        props.valid ? "" : "bg-textGrey text-[white]"
-      }  w-full h-full rounded-[2rem]`}
+        props.valid ? "bg-bgBlack" : "bg-textGrey"
+      }  w-full h-full rounded-[2rem]  text-[white]`}
     >
-      {props.text}
+      {props.loading ? (
+        <BounceLoader
+          color={"white"}
+          // loading={loading}
+          // cssOverride={override}
+          size={40}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      ) : (
+        props.text
+      )}
     </button>
   );
 }

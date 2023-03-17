@@ -1,11 +1,18 @@
 import * as React from "react";
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
 import { AuthLayout } from "@/components/templates/AuthLayout";
 import { InputField } from "@/components/atoms/auth/InputField";
 import { AuthBtn } from "@/components/atoms/AuthBtn";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SetStateAction } from "react";
 import Link from "next/link";
-
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { Auth } from "firebase/auth";
+import { auth, db } from "@/firebase/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 export interface IIndexProps {}
 
 type Inputs = {
@@ -13,17 +20,49 @@ type Inputs = {
   lastName: string;
   email: string;
   password: string;
+  phoneNumber: string;
+};
+type Valid = {
+  firstName: boolean;
+  lastName: boolean;
+  email: boolean;
+  password: boolean;
+  phoneNumber: boolean;
+  terms: boolean;
+  sms: boolean;
 };
 export default function Index(props: IIndexProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
   const [inputs, setInputs] = useState<Inputs>({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
+    phoneNumber: "",
   });
-  console.log(inputs);
-  const setInputsHandler = (name: any, value: String) => {
-    setInputs((prev: any) => {
+  const [valid, setValid] = useState<Valid>({
+    firstName: true,
+    lastName: true,
+    email: true,
+    password: true,
+    phoneNumber: true,
+    terms: false,
+    sms: false,
+  });
+  const [formIsValid, setFormIsValid] = useState<boolean>(false);
+  // console.log(inputs);
+  // console.log(valid);
+  // console.log(formIsValid);
+  const setInputsHandler = (name: string, value: String) => {
+    setInputs((prev: SetStateAction<any>) => {
+      const temp = { ...prev };
+      temp[name] = value;
+      return temp;
+    });
+  };
+  const setValidHandler = (name: string, value: boolean) => {
+    setValid((prev: SetStateAction<any>) => {
       const temp = { ...prev };
       temp[name] = value;
       return temp;
@@ -31,15 +70,106 @@ export default function Index(props: IIndexProps) {
   };
   const firstNameHandler = (value: String) => {
     setInputsHandler("firstName", value);
+    value.length > 1
+      ? setValidHandler("firstName", true)
+      : setValidHandler("firstName", false);
   };
   const lastNameHandler = (value: String) => {
     setInputsHandler("lastName", value);
+    value.length > 1
+      ? setValidHandler("lastName", true)
+      : setValidHandler("lastName", false);
   };
   const email = (value: String) => {
     setInputsHandler("email", value);
+    value.length > 1 && value.includes("@") && value.includes(".com")
+      ? setValidHandler("email", true)
+      : setValidHandler("email", false);
   };
   const password = (value: String) => {
     setInputsHandler("password", value);
+    value.length > 5
+      ? setValidHandler("password", true)
+      : setValidHandler("password", false);
+  };
+  const numberHander = (value: string) => {
+    setInputsHandler("phoneNumber", value);
+    inputs.phoneNumber &&
+      (inputs.phoneNumber.length > 4
+        ? setValidHandler("phoneNumber", true)
+        : setValidHandler("phoneNumber", false));
+  };
+
+  // ALERT
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top",
+    showConfirmButton: false,
+    timer: 5000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener("mouseenter", Swal.stopTimer);
+      toast.addEventListener("mouseleave", Swal.resumeTimer);
+    },
+  });
+  useEffect(() => {
+    inputs.phoneNumber &&
+    inputs.firstName.length > 1 &&
+    inputs.email.length > 1 &&
+    inputs.email.includes("@") &&
+    inputs.email.includes(".com") &&
+    inputs.lastName.length > 1 &&
+    inputs.phoneNumber.length > 4 &&
+    inputs.password.length > 5 &&
+    valid.terms &&
+    valid.sms
+      ? setFormIsValid(true)
+      : setFormIsValid(false);
+  }, [inputs, valid]);
+  const submitHandler = () => {
+    if (formIsValid) {
+      setLoading(true);
+      createUserWithEmailAndPassword(auth, inputs.email, inputs.password)
+        .then((res) => {
+          const docRef = doc(db, "users", res.user.uid);
+          const data = {
+            uid: res.user.uid,
+            email: res.user.email,
+            firstName: inputs.firstName,
+            lastName: inputs.lastName,
+            phoneNumber: inputs.phoneNumber,
+          };
+          setDoc(docRef, data)
+            .then((res) => {
+              setLoading(false);
+              Toast.fire({
+                icon: "success",
+                title: "Signed up successfully",
+              });
+              router.push("/auth/login");
+            })
+            .catch((err) => {
+              setLoading(false);
+              console.log(err);
+              Toast.fire({
+                icon: "error",
+                title: "Failed",
+              });
+            });
+        })
+        .catch((err) => {
+          console.log(err.message);
+          const errorMessage =
+            err.message === "Firebase: Error (auth/email-already-in-use)."
+              ? "Email has been taken"
+              : "Error";
+          setLoading(false);
+          Toast.fire({
+            icon: "error",
+            title: errorMessage,
+          });
+        });
+    }
   };
   return (
     <AuthLayout>
@@ -49,17 +179,57 @@ export default function Index(props: IIndexProps) {
         {/* INPUTS */}
         <div className="mt-8 grid grid-cols-[48%_48%] justify-between">
           <div className="">
-            <InputField handler={firstNameHandler} name="First name" />
+            <InputField
+              value={inputs.firstName}
+              valid={valid.firstName}
+              handler={firstNameHandler}
+              name="First name"
+            />
           </div>
           <div className="">
-            <InputField handler={lastNameHandler} name="Last name" />
+            <InputField
+              value={inputs.lastName}
+              valid={valid.lastName}
+              handler={lastNameHandler}
+              name="Last name"
+            />
           </div>
         </div>
         <div className="mt-2">
-          <InputField handler={email} name="Email address" />
+          <InputField
+            valid={valid.email}
+            value={inputs.email}
+            handler={email}
+            name="Email address"
+          />
         </div>
         <div className="mt-2">
-          <InputField handler={password} name="Password" />
+          <label className="text-textGrey text-sm">Phone number</label>
+          <PhoneInput
+            // flagUrl="https://flag.pk/flags/4x3/{xx}.svg"
+            defaultCountry="US"
+            onBlur={() => {
+              inputs.phoneNumber &&
+                (inputs.phoneNumber.length > 4
+                  ? setValidHandler("phoneNumber", true)
+                  : setValidHandler("phoneNumber", false));
+            }}
+            className={`border w-full h-10 rounded-lg px-4 outline-none ${
+              !valid.phoneNumber && "border-orange-700"
+            }`}
+            // value={v}
+            onChange={(value: string) => {
+              numberHander(value);
+            }}
+          />
+        </div>
+        <div className="mt-2">
+          <InputField
+            valid={valid.password}
+            value={inputs.password}
+            handler={password}
+            name="Password"
+          />
         </div>
 
         {/*  */}
@@ -67,7 +237,15 @@ export default function Index(props: IIndexProps) {
           Use 8 or more characters with a mix of letters, numbers & symbols
         </div>
         <div className="grid grid-cols-[auto_auto] gap-x-2 mt-4">
-          <input type="checkbox" className="h-4 mt-1" />
+          <input
+            type="checkbox"
+            className="h-4 mt-1"
+            onChange={(e: any) =>
+              e.target.checked
+                ? setValidHandler("terms", true)
+                : setValidHandler("terms", false)
+            }
+          />
           <div className="text-sm">
             By creating an account, I agree to our{" "}
             <Link href="" className="underline">
@@ -81,7 +259,15 @@ export default function Index(props: IIndexProps) {
           </div>
         </div>
         <div className=" grid grid-cols-[auto_auto] gap-x-2 mt-4">
-          <input type="checkbox" className="h-4 mt-1 " />
+          <input
+            type="checkbox"
+            className="h-4 mt-1 "
+            onChange={(e: any) =>
+              e.target.checked
+                ? setValidHandler("sms", true)
+                : setValidHandler("sms", false)
+            }
+          />
           <div className="text-sm ">
             By creating an account, I am also consenting to receive SMS messages
             and emails, including product new feature updates, events, and
@@ -90,8 +276,8 @@ export default function Index(props: IIndexProps) {
         </div>
         {/*  */}
         <div className="mt-4 grid grid-cols-[8rem_auto]">
-          <div className=" w-28 h-10  ">
-            <AuthBtn text="Sign up" valid={false} />
+          <div className=" w-28 h-10" onClick={submitHandler}>
+            <AuthBtn text="Sign up" valid={formIsValid} loading={loading} />
           </div>
           <span className="mt-2">
             Already have an account?

@@ -38,8 +38,9 @@ export function MainLayout(props: IMainLayoutProps) {
       icon: flagIcon,
     },
   ];
+
   return (
-    <div className="bg-bgBlack pb-10 h-[100vh] min-h-[500px]">
+    <div className="bg-bgBlack pb-10 h-[100vh] min-h-[800px]">
       <TopNav />
       <div className="h-[92%] mt-8 grid grid-cols-[20rem_auto] relative ">
         <div className="flex flex-col px-8 py-8">
@@ -71,7 +72,9 @@ export function MainLayout(props: IMainLayoutProps) {
           </div>
           <hr className="my-8" />
         </div>
-        <div className="border">{props.children}</div>
+        <div className="border bg-[white] rounded-tl-lg rounded-bl-lg">
+          {props.children}
+        </div>
       </div>
     </div>
   );

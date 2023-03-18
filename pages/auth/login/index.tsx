@@ -11,6 +11,8 @@ import { getDoc, doc } from "firebase/firestore";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Toast } from "@/utils/swal";
 import { useRouter } from "next/router";
+import { setUser } from "@/redux/slices/userSlice";
+import { useDispatch } from "react-redux";
 
 export interface IIndexProps {}
 
@@ -23,6 +25,7 @@ type Valid = {
   password: true;
 };
 export default function Index(props: IIndexProps) {
+  const dispatch = useDispatch();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [formIsValid, setFormIsValid] = useState<boolean>(false);
@@ -92,8 +95,23 @@ export default function Index(props: IIndexProps) {
             icon: "success",
             title: "Sign in successful",
           });
-          router.push("/Dashboard");
-          console.log(res);
+          const docRef = doc(db, "users", res.user.uid);
+          getDoc(docRef).then((r: any) => {
+            console.log(r.data());
+            const data = r.data();
+            dispatch(
+              setUser({
+                email: data.email,
+                phoneNumber: data.phoneNumber,
+                lastName: data.lastName,
+                firstName: data.firstName,
+                uid: data.uid,
+              })
+            );
+            router.push("/Dashboard");
+          });
+          // router.push("/Dashboard");
+          // console.log(res);
           setLoading(false);
         })
         .catch((err) => {
@@ -113,7 +131,7 @@ export default function Index(props: IIndexProps) {
   };
   return (
     <AuthLayout>
-      <div className="bg-[white] w-full mt-10 rounded-2xl py-10 px-14">
+      <div className="bg-[white] w-full mt-10 rounded-2xl py-10 px-14 font-inter">
         <h1 className="text-2xl text-bold">Sign in now</h1>
         <div className="mt-8">
           <InputField

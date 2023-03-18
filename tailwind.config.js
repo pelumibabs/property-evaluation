@@ -14,6 +14,10 @@ module.exports = {
         bgBlack: "#1F1F1F",
         borderGrey: "#66666659",
         textGrey: "#666666",
+        textGrey2: "#667085",
+      },
+      fontFamily: {
+        inter: ["'Roboto', sans-serif"],
       },
     },
   },

@@ -8,11 +8,10 @@ import { useState, useEffect } from "react";
 import { SetStateAction } from "react";
 import Link from "next/link";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { Auth } from "firebase/auth";
 import { auth, db } from "@/firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import Swal from "sweetalert2";
 import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
 import { Toast } from "@/utils/swal";
 export interface IIndexProps {}
 
@@ -34,6 +33,7 @@ type Valid = {
 };
 export default function Index(props: IIndexProps) {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState<boolean>(false);
   const [inputs, setInputs] = useState<Inputs>({
     firstName: "",

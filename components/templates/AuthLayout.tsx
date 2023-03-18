@@ -10,7 +10,7 @@ export interface IAuthLayoutProps {
 
 export function AuthLayout(props: IAuthLayoutProps) {
   return (
-    <div className="bg-bgBlack pb-10">
+    <div className="bg-bgBlack pb-10 h-[100vh] min-h-[500px]">
       <TopNav />
       <div className="grid grid-cols-[auto] justify-around lg:grid-cols-[27rem_33rem] lg:justify-between w-full px-20 pt-[10vh]">
         <div className="hidden lg:block text-[white] p-2">

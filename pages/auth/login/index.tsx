@@ -108,9 +108,9 @@ export default function Index(props: IIndexProps) {
                 uid: data.uid,
               })
             );
-            router.push("/Dashboard");
+            router.push("/dashboard");
           });
-          // router.push("/Dashboard");
+          // router.push("/dashboard");
           // console.log(res);
           setLoading(false);
         })
@@ -119,8 +119,9 @@ export default function Index(props: IIndexProps) {
           const errorMessage =
             err.message == "Firebase: Error (auth/user-not-found)."
               ? "Invalid email "
-              : err.message == "Firebase: Error (auth/wrong-password)." &&
-                "Invalid password";
+              : err.message == "Firebase: Error (auth/wrong-password)."
+              ? "Invalid password"
+              : "Error";
           Toast.fire({
             icon: "error",
             title: errorMessage,

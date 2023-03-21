@@ -7,40 +7,93 @@ import barIcon from "../../assets/dashboard/bar.svg";
 import layerIcon from "../../assets/dashboard/3-layers.svg";
 import checkIcon from "../../assets/dashboard/check-square.svg";
 import flagIcon from "../../assets/dashboard/flag.svg";
+import { useRouter } from "next/router";
+import { signOut } from "firebase/auth";
+import { setUser } from "@/redux/slices/userSlice";
+import { auth } from "@/firebase/firebase";
+import { Toast } from "@/utils/swal";
+import { useDispatch } from "react-redux";
 export interface IMainLayoutProps {
   children: any;
 }
 
 export function MainLayout(props: IMainLayoutProps) {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const NavItems = [
     {
       name: "Dashboard",
-      route: "",
-      active: true,
+      route: "/dashboard",
+      active: false,
       icon: barIcon,
     },
     {
       name: "History",
-      route: "",
-      active: true,
+      route: "/history",
+      active: false,
       icon: layerIcon,
     },
     {
       name: "Create a Ticket",
-      route: "",
-      active: true,
+      route: "/createTicket",
+      active: false,
       icon: checkIcon,
     },
     {
       name: "Locate",
-      route: "",
-      active: true,
+      route: "/locate",
+      active: false,
       icon: flagIcon,
     },
   ];
 
+  const [navItems, setNavItems] = React.useState<any>(NavItems);
+  React.useEffect(() => {
+    setNavItems((prev: any) => {
+      const temp = [...NavItems];
+      temp.map((item, Iindex) => {
+        if (router.pathname == item.route) {
+          item.active = true;
+        }
+      });
+      return temp;
+    });
+  }, []);
+  const navHandler = (index: number, item: any) => {
+    setNavItems((prev: any) => {
+      const temp = [...NavItems];
+      temp.map((item, Iindex) => {
+        if (index == Iindex) {
+          item.active = true;
+        }
+      });
+      return temp;
+    });
+    router.push(item.route);
+  };
+  const signout = () => {
+    signOut(auth)
+      .then(() => {
+        Toast.fire({
+          icon: "success",
+          title: "Sign out successful",
+        });
+        dispatch(
+          setUser({
+            email: "",
+            phoneNumber: "",
+            lastName: "",
+            firstName: "",
+            uid: "",
+          })
+        );
+        router.push("/auth/login");
+      })
+      .catch((error: any) => console.log(error));
+  };
+
   return (
-    <div className="bg-bgBlack pb-10 h-[100vh] min-h-[800px]">
+    <div className="bg-bgBlack pb-10 min-h-[700px] h-[100vh] ">
       <TopNav />
       <div className="h-[92%] mt-8 grid grid-cols-[20rem_auto] relative ">
         <div className="flex flex-col px-8 py-8">
@@ -51,16 +104,23 @@ export function MainLayout(props: IMainLayoutProps) {
             <Search placeholder="Search" />
           </div>
           <div className=" grid grid-rows-4 gap-y-2 mt-6">
-            {NavItems.map((item: any, index: number) => {
+            {navItems.map((item: any, index: number) => {
               return (
-                <div className=" grid grid-cols-[2rem_auto] bg-[black] rounded-md px-4 py-2 gap-x-4">
+                <button
+                  onClick={() => {
+                    navHandler(index, item);
+                  }}
+                  className={`grid grid-cols-[2rem_auto] bg-[black] rounded-md px-4 py-2 gap-x-4 ${
+                    item.active && "border"
+                  }`}
+                >
                   <div className="w-full h-full relative">
                     <Image src={item.icon} fill alt="icon" />
                   </div>
                   <div className="w-full h-full relative text-[white]">
                     {item.name}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -68,11 +128,16 @@ export function MainLayout(props: IMainLayoutProps) {
             <div className="w-full h-full relative">
               <Image src={barIcon} fill alt="icon" />
             </div>
-            <div className="w-full h-full relative text-[white]">Log out</div>
+            <button
+              onClick={signout}
+              className="w-full h-full relative text-[white]"
+            >
+              Log out
+            </button>
           </div>
           <hr className="my-8" />
         </div>
-        <div className="border bg-[white] rounded-tl-lg rounded-bl-lg">
+        <div className="border bg-[white] rounded-tl-lg rounded-bl-lg h-[80vh] overflow-scroll">
           {props.children}
         </div>
       </div>

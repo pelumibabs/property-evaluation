@@ -17,7 +17,7 @@ module.exports = {
         textGrey2: "#667085",
       },
       fontFamily: {
-        inter: ["'Roboto', sans-serif"],
+        inter: ["'Manrope', sans-serif"],
       },
     },
   },

@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;1,100;1,300&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Manrope:ital,wght@0,100;0,300;1,100;1,300&display=swap"
           rel="stylesheet"
         />
       </Head>

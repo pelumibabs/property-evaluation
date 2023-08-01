@@ -2,6 +2,7 @@ import * as React from "react";
 import { MainLayout } from "@/components/templates/MainLayout";
 import { Button } from "@/components/atoms/Button";
 import { AuthBtn } from "@/components/atoms/AuthBtn";
+import MapBox from "@/components/maps/MapBox";
 export interface IAppProps {}
 
 export default function App(props: IAppProps) {
@@ -25,6 +26,9 @@ export default function App(props: IAppProps) {
             <AuthBtn text="Continue" valid={true} loading={false} />
           </div>
         </div>
+      </section>
+      <section className="p-8">
+        <MapBox />
       </section>
     </MainLayout>
   );

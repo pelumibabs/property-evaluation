@@ -18,7 +18,7 @@ class MapBox extends Component {
   };
 
   render() {
-    const { google } = this.props;
+    //const { google } = this.props;
     const { selectedLocation } = this.state;
 
     return (

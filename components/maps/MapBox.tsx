@@ -1,7 +1,11 @@
 import React, { Component } from "react";
-import { Map, GoogleApiWrapper, Marker } from "google-maps-react";
+import { Map, GoogleApiWrapper, Marker, IMapProps } from "google-maps-react";
 
-class MapBox extends Component {
+interface MapBoxProps extends IMapProps {
+  google: any; // Change 'any' to the appropriate type for your Google API object
+}
+
+class MapBox extends Component<MapBoxProps> {
   state = {
     selectedLocation: null,
   };
@@ -18,8 +22,8 @@ class MapBox extends Component {
   };
 
   render() {
-    //const { google } = this.props;
     const { selectedLocation } = this.state;
+    const { google } = this.props;
 
     return (
       <div className="relative w-full h-0 pb-80">
@@ -37,7 +41,7 @@ class MapBox extends Component {
             lat: 6.5244,
             lng: 3.3792,
           }}
-          onClick={this.handleMapClick} // Add the onClick event handler
+          onClick={this.handleMapClick}
         >
           {selectedLocation && (
             <Marker position={selectedLocation} name="Selected Location" />

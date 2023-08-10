@@ -53,5 +53,5 @@ class MapBox extends Component<MapBoxProps> {
 }
 
 export default GoogleApiWrapper({
-  apiKey: "AIzaSyAWjAnWlKfqH29M6oKilvfsB3VA13LDHC4", // Remember to add your API key here
+  apiKey: "", // Remember to add your API key here
 })(MapBox);

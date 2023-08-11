@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Map, GoogleApiWrapper, Marker, IMapProps } from "google-maps-react";
+import { Map, GoogleApiWrapper, Marker, IProvidedProps } from "google-maps-react";
 
-interface MapBoxProps extends IMapProps {
-  google: any; // Change 'any' to the appropriate type for your Google API object
+interface MapBoxProps extends IProvidedProps {
+  google: any; 
 }
 
 class MapBox extends Component<MapBoxProps> {
@@ -29,7 +29,6 @@ class MapBox extends Component<MapBoxProps> {
       <div className="relative w-full h-0 pb-80">
         <Map
           google={google}
-          zoom={14}
           style={{
             position: "absolute",
             top: 0,
@@ -42,11 +41,8 @@ class MapBox extends Component<MapBoxProps> {
             lng: 3.3792,
           }}
           onClick={this.handleMapClick}
-        >
-          {selectedLocation && (
-            <Marker position={selectedLocation} name="Selected Location" />
-          )}
-        </Map>
+        />
+        {selectedLocation}
       </div>
     );
   }

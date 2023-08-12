@@ -34,7 +34,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data }) => {
               />
             </svg>
             <p className="text-xl font-semibold">
-              The estimated value of the property is {data}
+              The estimated value of the property is:
+              <pre>{JSON.stringify(data, null, 2)}</pre>
             </p>
           </div>
         </div>

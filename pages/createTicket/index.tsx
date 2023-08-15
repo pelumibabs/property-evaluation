@@ -19,7 +19,7 @@ export default function App(props: IAppProps) {
 
   const handleFormSubmit = async (formData: FormData) => {
     try {
-      const response = await fetch("https://property-eval.onrender.com/predict", {
+      const response = await fetch("http://127.0.0.1:4999/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -49,11 +49,6 @@ export default function App(props: IAppProps) {
       <div>Create a ticket</div>
       <section className="p-8">
         <FormComponent onSubmit={handleFormSubmit} />
-        {result && (
-          <div className="mt-4">
-            Result: <pre>{JSON.stringify(result, null, 2)}</pre>
-          </div>
-        )}
       </section>
       
       <Modal isOpen={isModalOpen} onClose={closeModal} data={result} />
